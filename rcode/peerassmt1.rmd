@@ -1,16 +1,18 @@
 ---
-title: "Coursera Reproducible Research Peer Assessment #1"
+title: 'Coursera Reproducible Research Peer Assessment #1'
 author: "Bill Cary"
 date: "Sunday, December 7, 2014"
-output: pdf_document
+output: html_document
 ---
 
-#### Set knitr to echo code by default
+#### Set defaults
+Set knitr to echo code by default
 ```{r setoptions, echo = TRUE}
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Set echo=TRUE by default
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-opts_chunks$set(echo = TRUE)
+library(knitr)
+opts_chunk$set(echo = TRUE)
 
 ```
 
@@ -19,20 +21,20 @@ opts_chunks$set(echo = TRUE)
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Import required libraries
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-library(ggplot2, quietly = TRUE)  # General plotting functions
-library(dplyr, quietly = TRUE) # Data manipulation
-library(reshape2, quietly = TRUE)
-library(MASS, quietly = TRUE)
-library(DescTools, quietly = TRUE)
+suppressMessages(library(ggplot2))  # General plotting functions
+suppressMessages(library(dplyr)) # Data manipulation
+suppressMessages(library(reshape2))
+suppressMessages(library(DescTools))
+suppressMessages(library(lubridate))
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Set paths for files and directory structure
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-path_root <- getwd()
-path_source <- paste0(path_root, "/src/")
-path_data <- paste0(path_root, '/data/activity.csv')
+path_data <- '../data/activity.csv'
+
 ```
 
+#### Loading and preprocessing the data
 Read the dataset into R and summarize the data
 ```{r loaddata}
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -46,6 +48,7 @@ data <- read.csv(path_data)
 Desc(data)
 ```
 
+#### Miscellaneous Support Information
 Print out system and session information to support future readers in
 replicating the environment used to produce the output, and in troubleshooting
 any potential issues that arise when running the code.
@@ -56,93 +59,3 @@ any potential issues that arise when running the code.
 print(sessionInfo())
 print(Sys.info())
 ```
-
-### Executive Summary
-The purpose of this exercise is to determine if there is a difference in fuel
-economy between cars with automatic vs. manual transmissions.  My initial
-approach to the problem was to read in the dataset and perform an intial
-exploratory data analysis.  Based on the intial analysis, consisting of a
-boxplot of fuel economy figure for manual vs. automatic transmission vehicles
-along with a t.test comparing the two transmission types, there appeared to be
-a statistically significant difference between the fuel economy performance
-offered by each transmission type.
-
-To verify that a relationship between transmission type and fuel economy truly
-exists, a linear regression analysis was conducted.  The initial model uses
-all predictors in the dataset.  This model did not yield useful information in
-terms of statistically significant coefficients.  Following this, a stepwise
-linear regression was conducted using stepAIC from the MASS package.  This
-analysis indicates that transmission type does in fact contribute to fuel
-economy, with a fuel economy improvement, on average, of `r model2[[1]][4]`
-for cars with manual transmissions vs automatic transmissions.  The 95%
-confidence interval for this estimate is `r confint(model2)[4,]`.
-
-### Analysis
-
-#### Load mtcars dataset and perform initial exploratory analysis
-
-Based on the boxplot below, there appears to be a difference in fuel economy
-between manual and automatic transmission vehicles, with manual transmissions
-providing greater fuel economy.
-
-```{r boxplot, cache=TRUE, fig.height=2, fig.width=4, echo = FALSE, results=TRUE, warning=FALSE, message=FALSE}
-#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-# Create boxplot of mpg by transmission type
-#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-data(mtcars)
-
-mtcars$am <- as.factor(mtcars$am)
-levels(mtcars$am) <- c("Automatic", "Manual")
-
-p <- ggplot(mtcars, aes(am, mpg))
-p + geom_boxplot()
-
-```
-
-A Student's T-Test of the difference in means between automatic and manual
-transmissions (with a Null Hypothesis of no difference), also indicates that
-there is a difference in fuel economy between the two engine types, with a
-p-value of `r ttest$p.value`.
-
-The correlation figures below, as well as the correlation plot included in the
-appenix, indicate that while transmission type is not correlated to fuel
-economy as strongly as some other variables, a postive correlation between
-manual transmissions and improved fule economy is still present.
-
-```{r correlation, cache=TRUE, fig.height=3, fig.width=4, echo = FALSE, results=FALSE, warning=FALSE, message=FALSE}
-#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-# Display correlation between mpg and other variables in the mtcars dataset
-#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-data(mtcars)
-sort(cor(mtcars)[1,])
-```
-
-#### Conduct Regression Analysis
-The initial, all inclusive model yields the following results:
-
-```{r echo = TRUE, results=TRUE, warning=FALSE, message=FALSE}
-summary(model1)[1]
-```
-
-Under this model, a manual transmission provides an additional
-`r model1[[1]][9]` miles per gallon in fueleconomy over an automatic
-transmission.  However, as can be seen with the high p-value, this
-coefficient is not statistically significant.
-
-The second model was created using a two-way step model (with the stepAIC
-package) to allow R to iterate through various combinations of predictors to
-find the one yielding the highest R-squared.  The model and its results are as
-follows:
-
-```{r echo = TRUE, results=TRUE, warning=FALSE, message=FALSE}
-summary(model2)
-```
-
-Under this model, a manual transmission
-provides an additional `r model2[[1]][4]` mpg over an automatic transmission
-with a confidence interval of `r confint(model2)[4,]`.
-
-Residual plots contained in the appendix clearly show a non-random pattern in
-the residual values.  This indicates that the two models do not fully capture
-all systematic sources of variation in the data.  Additional modeling could
-potentially provide a better fit.
