@@ -26,6 +26,7 @@ suppressMessages(library(dplyr)) # Data manipulation
 suppressMessages(library(reshape2))
 suppressMessages(library(DescTools))
 suppressMessages(library(lubridate))
+suppressMessages(library(Amelia))  # Imputation of missing values
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Set paths for files and directory structure
@@ -45,7 +46,30 @@ data <- read.csv(path_data)
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Briefly summarize the dataset
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Desc(data)
+summary(data)
+str(data)
+str(data$steps)
+str(data$date)
+str(data$interval)
+```
+
+#### Transform the Data
+The data$date field is stored as a factor and needs to be converted to a date.
+In addition, the data$steps field should be copied over and NA values should be
+replaced with real values for use later in the exercise.
+```{r transform}
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Create a new feature that stores the data$date field as an actual data value.
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+data$date.trans <- ymd(data$date)
+str(data$date.trans)
+
+str(data)
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Impute the missing values in data$steps
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+data$steps.trans <- mean(data$steps, na.rm = TRUE)
 ```
 
 #### Miscellaneous Support Information
@@ -57,5 +81,5 @@ any potential issues that arise when running the code.
 ## Print System and Session for reproducibility & troubleshooting.
 ## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 print(sessionInfo())
-print(Sys.info())
+# print(Sys.info())   omit Sys.info() for privacy reasons
 ```
