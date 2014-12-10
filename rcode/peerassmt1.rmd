@@ -120,6 +120,19 @@ ggplot(dailyavg, aes(x=interval, y=dailymean)) +
         geom_point(shape=1)      # Use hollow circles
 ```
 
+Now that we have averaged the number of steps by interval, it is simple to
+determine the specific interval that has, on average, the highest number of
+steps.
+```{r maxstepsinterval}
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Use which.max() to determine the row with the maximum number of steps
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+dailyavg[which.max(dailyavg[,2]),]
+```
+
+As can be seen above, the interval with the maximum average number of steps
+is interval number `r dailyavg[which.max(dailyavg[,2]),][,1]`.
+
 #### Miscellaneous Support Information
 Print out system and session information to support future readers in
 replicating the environment used to produce the output, and in troubleshooting
