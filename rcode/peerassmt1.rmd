@@ -2,7 +2,7 @@
 title: 'Coursera Reproducible Research Peer Assessment #1'
 author: "Bill Cary"
 date: "Sunday, December 7, 2014"
-output: html_document
+output: pdf_document
 ---
 
 #### Set defaults
@@ -21,12 +21,10 @@ opts_chunk$set(echo = TRUE)
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Import required libraries
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-suppressMessages(library(ggplot2))  # General plotting functions
-suppressMessages(library(dplyr)) # Data manipulation
-suppressMessages(library(reshape2))
-suppressMessages(library(DescTools))
-suppressMessages(library(lubridate))
-suppressMessages(library(Amelia))  # Imputation of missing values
+suppressMessages(library(ggplot2))     # General plotting functions
+suppressMessages(library(plyr))        # Data manipulation
+suppressMessages(library(lubridate))   # Handling date values
+suppressMessages(library(Amelia))      # Imputation of missing values
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Set paths for files and directory structure
@@ -70,6 +68,56 @@ str(data)
 # Impute the missing values in data$steps
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 data$steps.trans <- mean(data$steps, na.rm = TRUE)
+```
+
+#### What is mean total number of steps taken per day?
+First, we plot a histogram illustrating the distribution of steps taken per
+day.  To do, this we first summarize the data to determine the total number
+of steps taken each day.  (Because the raw dataset reports the data in five
+minute intervals.)
+```{r histogram}
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Summarize data to determine the total number of steps taken each day.
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+sumdata <- ddply(data, c('date.trans'), summarise,
+               dailysum = sum(steps))
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Create a histogram plot
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+qplot(sumdata$dailysum, binwidth = 1350)
+```
+
+
+Next, we calculate the mean and median total steps per day, ignoring NA values.
+```{r meanmedian}
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Use data summarized above to determine daily mean and median steps
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+meansteps <- mean(sumdata$dailysum, na.rm = TRUE)
+mediansteps <- median(sumdata$dailysum, na.rm = TRUE)
+```
+
+The mean number of steps taken per day is `r meansteps` and the median number
+of steps taken per day is `r mediansteps`.
+
+#### What is the average daily activity pattern?
+Next, we will create a time series plot of the average number of steps across
+all days (y-axis) by five-minute interval (x-axis).  To create this plot, we
+first use plyr to calculate the average number of steps for each interval prior
+to creating the time series plot.
+```{r dailyactivity}
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Summarize data to determine the total number of steps taken each day.
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+dailyavg <- ddply(data, c('interval'), summarise,
+               dailymean = mean(steps, na.rm = TRUE))
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Create the plot
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ggplot(dailyavg, aes(x=interval, y=dailymean)) + 
+        geom_point(shape=1)      # Use hollow circles
 ```
 
 #### Miscellaneous Support Information
