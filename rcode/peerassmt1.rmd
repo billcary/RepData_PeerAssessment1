@@ -2,7 +2,7 @@
 title: 'Coursera Reproducible Research Peer Assessment #1'
 author: "Bill Cary"
 date: "Sunday, December 7, 2014"
-output: pdf_document
+output: html_document
 ---
 
 #### Set defaults
@@ -34,7 +34,7 @@ path_data <- '../data/activity.csv'
 ```
 
 #### Loading and preprocessing the data
-Read the dataset into R and summarize the data
+Read the dataset into R and summarize the data.
 ```{r loaddata}
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Read the data into R
@@ -52,8 +52,8 @@ str(data$interval)
 ```
 
 #### Transform the Data
-The data$date field is stored as a factor and needs to be converted to a date.
-In addition, the data$steps field should be copied over and NA values should be
+The data['date'] field is stored as a factor and needs to be converted to a date.
+In addition, the data['steps'] field should be copied over and NA values should be
 replaced with real values for use later in the exercise.
 ```{r transform}
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -132,6 +132,18 @@ dailyavg[which.max(dailyavg[,2]),]
 
 As can be seen above, the interval with the maximum average number of steps
 is interval number `r dailyavg[which.max(dailyavg[,2]),][,1]`.
+
+####Imputing missing values
+First, we determine the number of missing values in the steps field as follows:
+```{r nummissingvalues}
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Summarize the data$steps field to see the number of NA values
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+summary(data$steps)
+```
+As can be seen above, the steps field contains `r sum(is.na(data$steps))` NA
+values.
+
 
 #### Miscellaneous Support Information
 Print out system and session information to support future readers in
