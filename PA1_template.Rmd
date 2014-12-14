@@ -118,7 +118,7 @@ dailyavg <- ddply(data, c('interval'), summarise,
 # Create the plot
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ggplot(dailyavg, aes(x=interval, y=dailymean)) + 
-        geom_point(shape=1)      # Use hollow circles
+        geom_line()
 ```
 
 Now that we have averaged the number of steps by interval, it is simple to
@@ -226,7 +226,7 @@ dailyavg <- ddply(merged, c('interval', 'weekday'), summarise,
 # Create the plot
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ggplot(dailyavg, aes(x=interval, y=dailymean)) + 
-        geom_point(shape=1) +
+        geom_line() +
         facet_grid(weekday ~ .)
 ```
 

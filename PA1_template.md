@@ -31,7 +31,7 @@ suppressMessages(library(timeDate))    # Handling date values
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Set paths for files and directory structure
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-path_data <- '../data/activity.csv'
+path_data <- './data/activity.csv'
 ```
 
 #### Loading and preprocessing the data
@@ -42,18 +42,7 @@ Read the dataset into R and summarize the data.
 # Read the data into R
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 data <- read.csv(path_data)
-```
 
-```
-## Warning: cannot open file '../data/activity.csv': No such file or
-## directory
-```
-
-```
-## Error: cannot open the connection
-```
-
-```r
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Briefly summarize the dataset
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -61,13 +50,13 @@ summary(data)
 ```
 
 ```
-##      steps               date          interval      date.trans        
-##  Min.   :  0.0   2012-10-01:  288   Min.   :   0   Min.   :2012-10-01  
-##  1st Qu.:  0.0   2012-10-02:  288   1st Qu.: 589   1st Qu.:2012-10-16  
-##  Median :  0.0   2012-10-03:  288   Median :1178   Median :2012-10-31  
-##  Mean   : 37.4   2012-10-04:  288   Mean   :1178   Mean   :2012-10-31  
-##  3rd Qu.: 12.0   2012-10-05:  288   3rd Qu.:1766   3rd Qu.:2012-11-15  
-##  Max.   :806.0   2012-10-06:  288   Max.   :2355   Max.   :2012-11-30  
+##      steps               date          interval   
+##  Min.   :  0.0   2012-10-01:  288   Min.   :   0  
+##  1st Qu.:  0.0   2012-10-02:  288   1st Qu.: 589  
+##  Median :  0.0   2012-10-03:  288   Median :1178  
+##  Mean   : 37.4   2012-10-04:  288   Mean   :1178  
+##  3rd Qu.: 12.0   2012-10-05:  288   3rd Qu.:1766  
+##  Max.   :806.0   2012-10-06:  288   Max.   :2355  
 ##  NA's   :2304    (Other)   :15840
 ```
 
@@ -76,11 +65,10 @@ str(data)
 ```
 
 ```
-## 'data.frame':	17568 obs. of  4 variables:
-##  $ steps     : int  NA NA NA NA NA NA NA NA NA NA ...
-##  $ date      : Factor w/ 61 levels "2012-10-01","2012-10-02",..: 1 1 1 1 1 1 1 1 1 1 ...
-##  $ interval  : int  0 5 10 15 20 25 30 35 40 45 ...
-##  $ date.trans: POSIXct, format: "2012-10-01" "2012-10-01" ...
+## 'data.frame':	17568 obs. of  3 variables:
+##  $ steps   : int  NA NA NA NA NA NA NA NA NA NA ...
+##  $ date    : Factor w/ 61 levels "2012-10-01","2012-10-02",..: 1 1 1 1 1 1 1 1 1 1 ...
+##  $ interval: int  0 5 10 15 20 25 30 35 40 45 ...
 ```
 
 ```r
@@ -195,7 +183,7 @@ dailyavg <- ddply(data, c('interval'), summarise,
 # Create the plot
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ggplot(dailyavg, aes(x=interval, y=dailymean)) + 
-        geom_point(shape=1)      # Use hollow circles
+        geom_line()
 ```
 
 ![plot of chunk dailyactivity](figure/dailyactivity.png) 
@@ -323,7 +311,7 @@ dailyavg <- ddply(merged, c('interval', 'weekday'), summarise,
 # Create the plot
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ggplot(dailyavg, aes(x=interval, y=dailymean)) + 
-        geom_point(shape=1) +
+        geom_line() +
         facet_grid(weekday ~ .)
 ```
 
@@ -369,10 +357,10 @@ print(sessionInfo())
 ## loaded via a namespace (and not attached):
 ##  [1] assertthat_0.1   colorspace_1.2-4 digest_0.6.4     evaluate_0.5.5  
 ##  [5] foreign_0.8-61   formatR_1.0      grid_3.1.1       gtable_0.1.2    
-##  [9] htmltools_0.2.6  labeling_0.3     MASS_7.3-35      memoise_0.2.1   
-## [13] munsell_0.4.2    parallel_3.1.1   proto_0.3-10     reshape2_1.4    
-## [17] rmarkdown_0.3.3  scales_0.2.4     stringr_0.6.2    tools_3.1.1     
-## [21] yaml_2.1.13
+##  [9] htmltools_0.2.6  labeling_0.3     markdown_0.7.4   MASS_7.3-35     
+## [13] memoise_0.2.1    mime_0.2         munsell_0.4.2    parallel_3.1.1  
+## [17] proto_0.3-10     reshape2_1.4     rmarkdown_0.3.3  scales_0.2.4    
+## [21] stringr_0.6.2    tools_3.1.1      yaml_2.1.13
 ```
 
 ```r
