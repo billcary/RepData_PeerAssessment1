@@ -23,6 +23,7 @@ opts_chunk$set(echo = TRUE)
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 suppressMessages(library(ggplot2))     # General plotting functions
 suppressMessages(library(plyr))        # Data manipulation
+suppressMessages(library(dplyr))        # Data manipulation
 suppressMessages(library(lubridate))   # Handling date values
 suppressMessages(library(Amelia))      # Imputation of missing values
 
@@ -142,8 +143,60 @@ First, we determine the number of missing values in the steps field as follows:
 summary(data$steps)
 ```
 As can be seen above, the steps field contains `r sum(is.na(data$steps))` NA
-values.
+values.  Next, we will create a new dataset that is a copy of the old dataset,
+but with NA values replaced by the average for the respective intervals.
+```{r replaceNAs}
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Group by interval number, and calculate the interval means
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+interval_means <- summarise(grouped <- group_by(data, interval),
+                            intmean = mean(steps, na.rm = TRUE))
 
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Copy the original dataframe, then merge the new interval means dataframe
+# with the copy
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+newdata <- data
+merged <- merge(newdata, interval_means, "interval")
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Add a new column containing the steps value, with NA's replaced by the
+# interval mean
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+merged <- mutate(merged, newsteps = ifelse(is.na(steps), intmean, steps))
+```
+Following these operations, the new column - newsteps - contains no NA values.
+`r summary(merged$newsteps)`
+
+Next, using the new data, we plot a histogram illustrating the distribution of
+steps taken per day.  To do, this we first summarize the data to determine the
+total number of steps taken each day.  (Because the raw dataset reports the
+data in fiveminute intervals.)
+```{r newhistogram}
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Summarize data to determine the total number of steps taken each day.
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+sumdata <- ddply(merged, c('date.trans'), summarise,
+               dailysum = sum(newsteps))
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Create a histogram plot
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+qplot(sumdata$dailysum, binwidth = 1350)
+```
+
+
+Next, we calculate the mean and median total steps per day, ignoring NA values.
+```{r newmeanmedian}
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Use data summarized above to determine daily mean and median steps
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+meansteps <- mean(sumdata$dailysum, na.rm = TRUE)
+mediansteps <- median(sumdata$dailysum, na.rm = TRUE)
+```
+
+The mean number of steps taken per day is `r meansteps` and the median number
+of steps taken per day is `r mediansteps`.
 
 #### Miscellaneous Support Information
 Print out system and session information to support future readers in
